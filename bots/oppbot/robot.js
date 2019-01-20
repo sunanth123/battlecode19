@@ -1,0 +1,1 @@
+import {BCAbstractRobot, SPECS} from 'battlecode';
