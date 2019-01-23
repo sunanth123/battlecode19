@@ -1,4 +1,4 @@
-# battlecode19
+# Battlecode19
 
 
 Preliminary test can be done via the following command:
