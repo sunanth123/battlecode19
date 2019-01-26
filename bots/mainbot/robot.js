@@ -12,6 +12,7 @@ class MyRobot extends BCAbstractRobot {
     constructor() {
         super();
         this.unit_type = undefined;
+
         //can store other map information and message info as fields here
     }
 
@@ -40,5 +41,5 @@ class MyRobot extends BCAbstractRobot {
             }
         }
         return this.unit_type.makemove(this);
-    }
+  }
 }
