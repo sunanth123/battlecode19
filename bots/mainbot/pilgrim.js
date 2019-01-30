@@ -2,7 +2,7 @@ import {BCAbstractRobot, SPECS} from 'battlecode';
 
 const pilgrim = {};
 
-//helper function to get the suqare distance from the current location to the destination
+//helper function to get the square distance from the current location to the destination
 function square_distance(start, dest)
 {
 	var sq_dis = Math.pow(start.x - dest.x, 2) + Math.pow(start.y - dest.y, 2);
@@ -34,44 +34,65 @@ pilgrim.makemove = (self) => {
   
   const karboniteMap = self.getKarboniteMap();
   const fuelMap = self.getFuelMap();
-  const fullMap = self.getPassableMap();
   const visibleRobots = self.getVisibleRobots();
 
   var xcord = self.me.x;
   var ycord = self.me.x;
-  
-  //mining
-  var karbonite_loc = getClosestRes(self.me, karboniteMap);
-  var fuel_loc = getClosestRes(self.me, fuelMap);
-  var karbonite_dis = square_distance(self.me, karbonite_loc);
-  var fuel_dis = square_distance(self.me, fuel_loc);
-  var fuel_consume1 = karbonite_dis + 1;
-  var fuel_consume2 = fuel_dis + 1;
-  if(self.me.karbonite <= 18 && self.me.fule <= 90) {
-    if(karbonite_dis <= fuel_dis && fuel_consume1 < 50) {
-      dx = karbonite_loc.x - xcord;
-      dy = karbonite_loc.y - ycord;
-      self.move(dx, dy);
-      return self.mine();
+ 
+  var resource_loc = self.me;
+
+  //the flag to check the resource category
+  //var flag = 0; 
+
+  //check if there's another pilgrim nearby
+  for(var i=0; i<visibleRobots.length; i++){
+    if(visibleRobots[i].team === self.me.team && visibleRobots[i].unit == 2 && square_distance(self.me, visibleRobots[i]) > 1){
+      resource_loc = getClosestRes(self.me, fuelMap);
     }
-    else if(karbonite_dis > fuel_dis && fuel_consume2 < 50) {
-      dx = fuel_loc.x - xcord;
-      dy = fuel_loc.y - ycord;
-      self.move(dx, dy);
+    else{
+//      flag = 1
+      resource_loc  = getClosestRes(self.me, karboniteMap);
+    }
+  }
+  
+  //mine or depot
+  if(self.me.karbonite < 20 || self.me.fuel < 100) {
+    if(square_distance(self.me, resource_loc) === 0){
       self.log("mining");
       return self.mine();
     }
     else{
-      self.log("unable to mine");
+      dx = resource_loc.x - xcord;
+      dy = resource_loc.y - ycord;
+      self.log("pilgrim moving");
+      return self.move(dx, dy);
     }
   }
-  
-  //depot
-  for(var i=0; i<visibleRobots.length; i++) {
-    if(visibleRobots[i].team === self.me.team && square_distance(self.me, visibleRobots[i]) <= 2) {
-      return self.give(visibleRobots[i].x-self.me.x, visibleRobots[i].y-self.me.y, self.me.karbonite, self.me.fuel);
+  else{
+    //if castle is in the adjacent position, depot   
+    for(var i=0; i<visibleRobots.length; i++){
+      if(square_distance(self.me, visibleRobots[i]) <= 2 && visibleRobots[i].team === self.me.team && visibleRobots[i].unit === 0){
+        dx = visibleRobots[i].x - self.me.x;
+        dy = visibleRobots[i].y -self.me.x;
+	self.log("pilgrim depoting resource");
+        return self.give(dx, dy, self.me.karbonite, self.me.fuel);
+      }
     }
-  }    
+  }	  
+
+  //otherwise, just move to castles
+  for(var i=0; i<visibleRobots.length; i++){
+    if(visibleRobots[i].team = self.me.team){
+      if(visibleRobots[i].unit = 0){
+	dx = visibleRobots[i].x - self.me.x;
+	dy = visibleRobots[i].y - self.me.y;
+	self.log("pilgrim moving");
+	return self.move(dx,dy);
+      }
+    } 
+  }
+  
+
+}
  
-};
 export default pilgrim;
