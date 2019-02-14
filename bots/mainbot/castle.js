@@ -74,7 +74,7 @@ function buildOnEmptyOther(buildvision,fullmap,xcord,ycord)
 }
 
 //helper function to see if unit can be built in adjacent tile
-function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
+function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself,edge)
 {
      var returnedArray = [];
      var flag = 0;
@@ -85,7 +85,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      var x = myself.x - 1;
      var y = myself.y - 1;
 
-     if(buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dy = - 1;
        dx = - 1;
        inside += 1;
@@ -93,7 +93,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0;
        dy = - 1;
        inside += 1;
@@ -101,7 +101,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = - 1;
        inside += 1;
@@ -109,7 +109,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y;
-     if(buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 0;
        inside += 1;
@@ -117,7 +117,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y;
-     if(buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 0;
        inside += 1;
@@ -125,7 +125,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 1;
        inside += 1;
@@ -133,7 +133,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0
        dy = 1;
        inside += 1;
@@ -141,7 +141,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 1;
        inside += 1;
@@ -183,13 +183,27 @@ castle.makemove = (self) => {
   if (self.me.turn === 1){
     var xcord = self.me.x;
     var ycord = self.me.y;
+		var edge = fullmap.length - 1;
     //const karboniteMap = self.getKarboniteMap();
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, karboniteMap);
     self.log(resource);
     self.log(resource.x);
 
-    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,self.me);
+		// if (xcord === edge || xcord === 0 || ycord === edge || ycord === 0)
+		// {
+		// 			self.log("FKASFLKJASFJLKASJFLKAJSKFJKASFJLKASJFLK");
+		// 			var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
+		// 	    if (adjacentInfo[2] === 1){
+		// 	      self.log("unable to build pilgrim");
+		// 	    }
+		// 	    else{
+		// 	      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+		// 	      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+		// 			}
+		// }
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,self.me,edge);
     self.log(adjacentInfo[3]);
     if (adjacentInfo[2] === 1){
       self.log("unable to build pilgrim");
@@ -203,11 +217,25 @@ castle.makemove = (self) => {
   else if (self.me.turn === 2){
     var xcord = self.me.x;
     var ycord = self.me.y;
+		var edge = fullmap.length - 1;
     //const fuelMap = self.getFuelMap();
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, fuelMap);
 
-    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me);
+		// if (xcord === edge || xcord === 0 || ycord === edge || ycord === 0)
+		// {
+		// 			self.log("FKASFLKJASFJLKASJFLKAJSKFJKASFJLKASJFLK");
+		// 			var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
+		// 			if (adjacentInfo[2] === 1){
+		// 				self.log("unable to build pilgrim");
+		// 			}
+		// 			else{
+		// 				self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+		// 				return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+		// 			}
+		// }
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
     if (adjacentInfo[2] === 1){
       self.log("unable to build pilgrim");
     }
@@ -224,10 +252,10 @@ castle.makemove = (self) => {
     var ycord = self.me.y;
     var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
     if (adjacentInfo[2] === 1){
-      self.log("unable to build prophet");
+      self.log("unable to build crusaders");
     }
     else{
-      self.log("Building a prophet at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      self.log("Building a crusader at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
       return self.buildUnit(SPECS.CRUSADER, adjacentInfo[0], adjacentInfo[1]);
     }
   }
