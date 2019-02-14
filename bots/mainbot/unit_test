@@ -1,0 +1,41 @@
+[200~import {BCAbstractRobot, SPECS} from 'battlecode';
+import './pilgrim';
+
+//Pilgrim test
+var karb = self.me.karbonite;
+var fuel = self.me.fuel;
+
+if(self.me.unit === 2 && self.me.team === 1){
+	while(self.me.karbonite <= 18 && self.typed === 1 && square_distance (self.me, self.location) === 0){
+		self.me.turn += 1;
+		karb += 2;
+		if(self.me.karbonite === karb){
+			self.log("Pilgrim mining karbonate test passed");    
+		}else{
+			self.log("Pilgrim mining karbonite test failed");
+		}
+	}
+	while(self.me.fuel <= 90 && self.typed === 0 && square_distance(self.me, self.location) === 0){
+		self.me.turn += 1;
+		fuel += 10;
+		if(self.me.fuel === fuel){
+			self.log("Pilgrim mining fuel test passed");
+		}else{
+			self.log("Pilgrim mining fuel test failed");
+		}
+	}
+	if(self.me.karbonite === 20 || self.me.fuel === 100){
+		for(var j=0; j<visibleRobots.length; j++){
+			if(square_distance(self.me, visibleRobots[i]) <= 2 && visibleRobots[i].team === self.me.team && visibleRobots[i].unit === 0){
+				self.me.turn += 1;
+				if(self.me.karbonite === 0 && self.me.fuel === 0){
+					self.log("Pilgrim depoting resource test passed");
+				}else{
+					self.log("Pilgrim depoting resource test failed");
+				}
+			}
+		}
+
+	}
+
+}
