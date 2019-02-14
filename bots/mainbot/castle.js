@@ -85,7 +85,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      var x = myself.x - 1;
      var y = myself.y - 1;
 
-     if(buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord-1][xcord-1] != undefined && buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dy = - 1;
        dx = - 1;
        inside += 1;
@@ -93,7 +93,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord-1][xcord] != undefined && buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0;
        dy = - 1;
        inside += 1;
@@ -101,7 +101,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord-1][xcord+1] != undefined && buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = - 1;
        inside += 1;
@@ -109,7 +109,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y;
-     if(buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord][xcord-1] != undefined && buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 0;
        inside += 1;
@@ -117,7 +117,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y;
-     if(buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord][xcord+1] != undefined && buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 0;
        inside += 1;
@@ -125,7 +125,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord+1][xcord-1] != undefined && buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 1;
        inside += 1;
@@ -133,7 +133,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord+1][xcord] != undefined &&	buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0
        dy = 1;
        inside += 1;
@@ -141,7 +141,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(buildvision[ycord+1][xcord+1] != undefined && buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 1;
        inside += 1;
@@ -183,11 +183,25 @@ castle.makemove = (self) => {
   if (self.me.turn === 1){
     var xcord = self.me.x;
     var ycord = self.me.y;
+		var edge = fullmap.length - 1;
     //const karboniteMap = self.getKarboniteMap();
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, karboniteMap);
     self.log(resource);
     self.log(resource.x);
+
+		if (xcord === edge || xcord === 0 || ycord === edge || ycord === 0)
+		{
+			self.log("FKASFLKJASFJLKASJFLKAJSKFJKASFJLKASJFLK");
+			var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
+	    if (adjacentInfo[2] === 1){
+	      self.log("unable to build pilgrim");
+	    }
+	    else{
+	      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+	      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+			}
+		}
 
     var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,self.me);
     self.log(adjacentInfo[3]);
@@ -207,6 +221,18 @@ castle.makemove = (self) => {
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, fuelMap);
 
+		if (xcord === edge || xcord === 0 || ycord === edge || ycord === 0)
+		{
+			var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
+			if (adjacentInfo[2] === 1){
+				self.log("unable to build pilgrim");
+			}
+			else{
+				self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+				return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+			}
+		}
+
     var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me);
     if (adjacentInfo[2] === 1){
       self.log("unable to build pilgrim");
@@ -218,17 +244,17 @@ castle.makemove = (self) => {
   }
 
 
-  //if karbonite is greater than or equal to 60 start making prophets
+  //if karbonite is greater than or equal to 60 start making crusaders
   if (self.karbonite >= 60){
     var xcord = self.me.x;
     var ycord = self.me.y;
     var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
     if (adjacentInfo[2] === 1){
-      self.log("unable to build prophet");
+      self.log("unable to build crusader");
     }
     else{
-      self.log("Building a prophet at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
-      return self.buildUnit(SPECS.PROPHET, adjacentInfo[0], adjacentInfo[1]);
+      self.log("Building a crusader at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      return self.buildUnit(SPECS.CRUSADER, adjacentInfo[0], adjacentInfo[1]);
     }
   }
 

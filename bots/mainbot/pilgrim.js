@@ -133,7 +133,7 @@ pilgrim.makemove = (self) => {
   //check if there's another pilgrim nearby
 if (!self.location && !self.typed)
 {
-		if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2).length % 2 === 0){
+		if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length % 2 === 0){
       self.log("fuel pilgrim");
       self.location = getClosestRes(self.me, fuelMap);
       self.typed = 0;

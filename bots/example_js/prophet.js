@@ -10,7 +10,7 @@ prophet.takeTurn = (self) => {
     self.log('health: ' + self.me.health);
 
     var visible = self.getVisibleRobots();
-    
+
     // get attackable robots
     var attackable = visible.filter((r) => {
         if (! self.isVisible(r)){
