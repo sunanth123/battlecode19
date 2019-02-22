@@ -157,6 +157,24 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself,edge)
      return returnedArray;
 }
 
+
+function is_horizontal(fullmap) {
+    const length = fullmap.length
+    var check = true;
+    for (let y = 0; check && length > y; y++) {
+        for (let x = 0; check && length > x; x++) {
+						if (fullmap[y][x] === fullmap[length - y -1][x]){
+							check = true;
+						}
+						else{
+							check = false;
+						}
+        }
+    }
+    return check
+}
+
+
 castle.makemove = (self) => {
   //add castle logic
   self.log("castle turn");
@@ -167,6 +185,21 @@ castle.makemove = (self) => {
   const visiblerobots = self.getVisibleRobots();
   const karboniteMap = self.getKarboniteMap();
   const fuelMap = self.getFuelMap();
+
+
+	const hor = is_horizontal(fullmap);
+	var enemy_x;
+	var enemy_y;
+	self.log(hor);
+	if (hor){
+		enemy_x = self.me.x;
+		enemy_y = fullmap.length - self.me.y - 1;
+	}
+	else{
+		enemy_x = fullmap.length - self.me.x - 1;
+		enemy_y = self.me.y
+	}
+	self.log("enemy castle at: " + enemy_x + " " + enemy_y);
 
   //check if enemy unit is in attack range and attack if in range
   for (var i=0; i<visiblerobots.length; i++) {
