@@ -288,8 +288,8 @@ castle.makemove = (self) => {
       self.log("unable to build crusaders");
     }
     else{
-      self.log("Building a crusader at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
-      return self.buildUnit(SPECS.CRUSADER, adjacentInfo[0], adjacentInfo[1]);
+      self.log("Building a prophet at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      return self.buildUnit(SPECS.PROPHET, adjacentInfo[0], adjacentInfo[1]);
     }
   }
 
