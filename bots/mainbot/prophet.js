@@ -87,31 +87,48 @@ prophet.makemove = (self) => {
 
 
 	//*** Check if enemies are within range
-	var enemies = visibleUnits.filter((robot) => {
-	if(robot.team !== self.me.team){
-	return true;
-	}
-	});
-	if(enemies.length > 0){ // Attacking
-	self.log("Crusader: " + self.id + "  Found an enemy");
-	var enemyToAttack; // Will contain id of robot to attack
-	var distance;      // Used to store how far away an enemy is.
-	for(var i = 0; i < 10; i++){
-	distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
-	if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
-	if(enemyToAttack == undefined){
-		self.log("Phrophet: " + self.id + "  Attacking");
-		enemyToAttack = enemies[i];
-		var dx = enemyToAttack.x - self.me.x;
-		var dy = enemyToAttack.y - self.me.y;
-		return self.attack(dx, dy);
-	}
-	}
-	}
-	}
+	// var enemies = visibleUnits.filter((robot) => {
+	// if(robot.team !== self.me.team){
+	// return true;
+	// }
+	// });
+	// if(enemies.length > 0){ // Attacking
+	// self.log("Crusader: " + self.id + "  Found an enemy");
+	// var enemyToAttack; // Will contain id of robot to attack
+	// var distance;      // Used to store how far away an enemy is.
+	// for(var i = 0; i < 10; i++){
+	// distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
+	// if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+	// if(enemyToAttack == undefined){
+	// 	self.log("Phrophet: " + self.id + "  Attacking");
+	// 	enemyToAttack = enemies[i];
+	// 	var dx = enemyToAttack.x - self.me.x;
+	// 	var dy = enemyToAttack.y - self.me.y;
+	// 	return self.attack(dx, dy);
+	// }
+	// }
+	// }
+	// }
+
+	for (var i=0; i<visibleUnits.length; i++) {
+    if (visibleUnits[i].team !== self.me.team){
+      const range = (visibleUnits[i].x-self.me.x)**2 + (visibleUnits[i].y-self.me.y)**2;
+      if (range >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && range <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+        self.log('Crusader attack ' + visibleUnits[i] + ' at ' + (visibleUnits[i].x - self.me.x, visibleUnits[i].y - self.me.y));
+        return self.attack(visibleUnits[i].x - self.me.x, visibleUnits[i].y - self.me.y);
+      }
+    }
+  }
 
 
 
+	if (!self.castle_loc){
+		for (var i=0; i<visibleUnits.length; i++) {
+			if (visibleUnits[i].team === self.me.team && visibleUnits[i].unit === 0){
+				self.castle_loc = visibleUnits[i];
+			}
+		}
+	}
 
 
 	if(inPosition == true) // Don't move if in position
@@ -126,6 +143,11 @@ prophet.makemove = (self) => {
 			goodLatticePoint = false;
 
 		if(fmap[self.me.y][self.me.x] == true) // Check to see if the unit is standing on fuel
+			goodLatticePoint = false;
+
+		//check to see if unit is next to a castle
+		var sq_dis = Math.pow(self.me.x - self.castle_loc.x, 2) + Math.pow(self.me.y - self.castle_loc.y, 2);
+		if(sq_dis < 3)
 			goodLatticePoint = false;
 
 		if(goodLatticePoint == true){
