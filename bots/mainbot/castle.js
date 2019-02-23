@@ -285,12 +285,16 @@ castle.makemove = (self) => {
     var ycord = self.me.y;
     var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
     if (adjacentInfo[2] === 1){
-      self.log("unable to build crusaders");
+      self.log("unable to build");
     }
-    else{
+    else if (self.me.turn < 500){
       self.log("Building a prophet at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
       return self.buildUnit(SPECS.PROPHET, adjacentInfo[0], adjacentInfo[1]);
     }
+		else{
+			self.log("Building a crusader at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      return self.buildUnit(SPECS.CRUSADER, adjacentInfo[0], adjacentInfo[1]);
+		}
   }
 
 

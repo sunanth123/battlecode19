@@ -10,7 +10,7 @@ prophet.takeTurn = (self) => {
     self.log('health: ' + self.me.health);
 
     var visible = self.getVisibleRobots();
-    
+
     // get attackable robots
     var attackable = visible.filter((r) => {
         if (! self.isVisible(r)){
@@ -71,7 +71,7 @@ prophet.takeTurn = (self) => {
         var r = attackable[0];
         self.log('' +r);
         self.log('attacking! ' + r + ' at loc ' + (r.x - self.me.x, r.y - self.me.y));
-        return self.attack(r.x - self.me.x, r.y - self.me.y);
+        //return self.attack(r.x - self.me.x, r.y - self.me.y);
     }
     // self.log("Crusader health: " + self.me.health);'
         if (!self.destination) {
