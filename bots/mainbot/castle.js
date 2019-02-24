@@ -201,6 +201,70 @@ castle.makemove = (self) => {
 	}
 	self.log("enemy castle at: " + enemy_x + " " + enemy_y);
 
+
+//castle talk logic to store location of all friendly castles and their coordinants
+			//self.log("MESSAGESEND " + robot.id + " " + robot.castle_talk)
+			var flag = 0;
+			var count = 0;
+			if(!self.friendlycastle){
+				self.friendlycastle = [];
+				for (let i = 0; i < visiblerobots.length;i++){
+					count += 1;
+					if (visiblerobots[i].castle_talk !== 0){
+						flag = 1;
+					}
+				}
+				//self.log("COUNT IS :" + count);
+				if (count === 4){
+					flag = 0;
+				}
+				if (flag === 0){
+					for (let x = 0; x < visiblerobots.length;x++){
+						self.friendlycastle.push([visiblerobots[x].id,visiblerobots[x].castle_talk,0]);
+					}
+				}
+				else{
+					for (let z = 0; z < visiblerobots.length;z++){
+						if (visiblerobots[z].castle_talk !== 0){
+							self.friendlycastle.push([visiblerobots[z].id,visiblerobots[z].castle_talk,0]);
+						}
+					}
+					self.friendlycastle.push([self.me.id,0,0]);
+				}
+			}
+			else if (self.me.turn < 4){
+				for (let i = 0; i < self.friendlycastle.length; i++){
+					for (let x = 0; x < visiblerobots.length;x++){
+						if (visiblerobots[x].id === self.friendlycastle[i][0] && self.friendlycastle[i][1] === 0){
+							self.friendlycastle[i][1] = visiblerobots[x].castle_talk;
+						}
+						else if (visiblerobots[x].id === self.friendlycastle[i][0] && self.friendlycastle[i][2] === 0){
+							self.friendlycastle[i][2] = visiblerobots[x].castle_talk;
+						}
+					}
+				}
+			}
+
+	self.log("NUMBER OF CASTLES " + self.friendlycastle.length);
+	self.log(self.friendlycastle);
+	self.log("TURN COUNT IS: " + self.me.turn);
+
+	if (self.me.turn === 1){
+		self.castleTalk(self.me.x);
+	}
+	if (self.me.turn === 2){
+		self.castleTalk(self.me.y);
+	}
+	if (self.me.turn === 3 && self.friendlycastle.length > 3){
+		for (let i = 0; i < self.friendlycastle.length; i++){
+			if (self.friendlycastle[i][1] === 0 && self.friendlycastle[i][2] === 0){
+				self.friendlycastle.splice(i,1);
+			}
+		}
+	}
+
+
+
   //check if enemy unit is in attack range and attack if in range
   for (var i=0; i<visiblerobots.length; i++) {
     if (visiblerobots[i].team !== self.me.team){
@@ -255,19 +319,6 @@ castle.makemove = (self) => {
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, fuelMap);
 
-		// if (xcord === edge || xcord === 0 || ycord === edge || ycord === 0)
-		// {
-		// 			self.log("FKASFLKJASFJLKASJFLKAJSKFJKASFJLKASJFLK");
-		// 			var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
-		// 			if (adjacentInfo[2] === 1){
-		// 				self.log("unable to build pilgrim");
-		// 			}
-		// 			else{
-		// 				self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
-		// 				return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
-		// 			}
-		// }
-
     var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
     if (adjacentInfo[2] === 1){
       self.log("unable to build pilgrim");
@@ -277,6 +328,83 @@ castle.makemove = (self) => {
       return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
     }
   }
+
+
+
+	if(visiblerobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length === 0){
+		var xcord = self.me.x;
+    var ycord = self.me.y;
+		var edge = fullmap.length - 1;
+    self.log(xcord + " " + ycord);
+    var resource = getClosestRes(self.me, karboniteMap);
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
+    if (adjacentInfo[2] === 1){
+      self.log("unable to build pilgrim");
+    }
+    else{
+      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+    }
+	}
+	else if(visiblerobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length === 1){
+		var xcord = self.me.x;
+    var ycord = self.me.y;
+		var edge = fullmap.length - 1;
+    self.log(xcord + " " + ycord);
+    var resource = getClosestRes(self.me, fuelMap);
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
+    if (adjacentInfo[2] === 1){
+      self.log("unable to build pilgrim");
+    }
+    else{
+      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+    }
+	}
+
+
+
+	if(!self.outwardlocal){
+		self.outwardlocal = 0;
+	}
+
+	const totalmove = //total possible moves
+					[[0,-1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [2, 0], [-2, 0], [0, 2], [0, -2], [3,0], [-3,0], [0,3], [0,-3], [2,2], [-2,-2], [-2,2], [2,-2], [2,1], [-2,1], [-2,-1], [2,-1], [1,2], [-1,2], [-1,-2], [1,-2]];
+
+
+	for (let i = 0; i < totalmove.length; i++){
+		if (fuelMap[self.me.y + totalmove[i][1]][self.me.x + totalmove[i][0]] === true)
+		{
+			self.outwardlocal += 1;
+		}
+		if (karboniteMap[self.me.y + totalmove[i][1]][self.me.x + totalmove[i][0]] === true)
+		{
+			self.outwardlocal += 1;
+		}
+	}
+	self.log("OUTWARD LOCAL: " + self.outwardlocal);
+	if (self.me.turn % 10 === 0 && visiblerobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length < self.outwardlocal){
+		var xcord = self.me.x;
+    var ycord = self.me.y;
+		var edge = fullmap.length - 1;
+    self.log(xcord + " " + ycord);
+    var resource = getClosestRes(self.me, fuelMap);
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
+    if (adjacentInfo[2] === 1){
+      self.log("unable to build pilgrim");
+    }
+    else{
+      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]))
+      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+    }
+	}
+
+	self.outwardlocal = 0;
+
+
 
 
   //if karbonite is greater than or equal to 60 start making prophets

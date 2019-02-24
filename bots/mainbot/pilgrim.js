@@ -27,7 +27,24 @@ function getClosestRes(current_loc, resource_map)
 	return closest_location;
 };
 
-function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
+
+function getreslist(current_loc, resource_map){
+	const map_length = resource_map.length;
+	var closest_location = [];
+	var closest_dist = 1000;
+
+	for (let y = 0; y < map_length; y++){
+		for (let x = 0; x < map_length; x++){
+			if (resource_map[y][x] && square_distance({x,y}, current_loc) < 25){
+				closest_location.push([x,y]);
+			}
+		}
+	}
+	return closest_location;
+};
+
+
+function onestep(buildvision,fullmap,xcord,ycord,resource,myself,edge)
 {
      var returnedArray = [];
      var flag = 0;
@@ -38,7 +55,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      var x = myself.x - 1;
      var y = myself.y - 1;
 
-     if(buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dy = - 1;
        dx = - 1;
        inside += 1;
@@ -46,7 +63,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0;
        dy = - 1;
        inside += 1;
@@ -54,7 +71,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = - 1;
        inside += 1;
@@ -62,7 +79,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y;
-     if(buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 0;
        inside += 1;
@@ -70,7 +87,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y;
-     if(buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 0;
        inside += 1;
@@ -78,7 +95,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 1;
        inside += 1;
@@ -86,7 +103,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0
        dy = 1;
        inside += 1;
@@ -94,7 +111,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 1;
        inside += 1;
@@ -113,13 +130,14 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
 pilgrim.makemove = (self) => {
   //add pilgrim logic
   self.log("pilgrim turn");
+	//self.castleTalk(77);
 
   const karboniteMap = self.getKarboniteMap();
   const fuelMap = self.getFuelMap();
   const visibleRobots = self.getVisibleRobots();
 	const buildvision = self.getVisibleRobotMap();
   const fullmap = self.getPassableMap();
-
+	var edge = fullmap.length - 1;
 
   var xcord = self.me.x;
   var ycord = self.me.y;
@@ -128,20 +146,73 @@ pilgrim.makemove = (self) => {
   //var fuel_loc = self.me;
   //var karbonite_loc = self.me;
 
-
+	// var karblist = getreslist(self.me, karboniteMap)
+	// self.log("karblist " + karblist);
+	// self.log(karblist[0][1]);
 
   //check if there's another pilgrim nearby
 if (!self.location && !self.typed)
 {
+		var flag = 0;
 		if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length % 2 === 0){
       self.log("fuel pilgrim");
       self.location = getClosestRes(self.me, fuelMap);
-      self.typed = 0;
+			if (square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+				var fuellist = getreslist(self.me, fuelMap)
+				self.log("fuellist " + fuellist);
+				for (let i = 0; i < fuellist.length;i++){
+					if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
+						self.location = {x: fuellist[i][0], y: fuellist[i][1]};
+						self.log("ULTIMA TEST fuel switch: " + self.location.x + " " + self.location.y);
+					}
+				}
+			}
+			if(square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+					var karblist = getreslist(self.me, karboniteMap);
+					for (let i = 0; i < karblist.length;i++){
+						if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
+							flag = 1;
+							self.location = {x: karblist[i][0], y: karblist[i][1]};
+							self.log("ULTIMA TEST fuel to karb: " + self.location.x + " " + self.location.y);
+						}
+					}
+			}
+			if (flag === 0){
+				self.typed = 0;
+			}
+			else {
+				self.typed = 1;
+			}
     }
     else{
       self.log("karb pilgrim");
       self.location  = getClosestRes(self.me, karboniteMap);
-      self.typed = 1;
+			if (square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+				var karblist = getreslist(self.me, karboniteMap)
+			//	self.log("karblist " + karblist);
+				for (let i = 0; i < karblist.length;i++){
+					if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
+						self.location = {x: karblist[i][0], y: karblist[i][1]};
+						self.log("ULTIMA TEST another karb: " + self.location.x + " " + self.location.y);
+					}
+				}
+			}
+			if(square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+					var fuellist = getreslist(self.me, fuelMap);
+					for (let i = 0; i < fuellist.length;i++){
+						if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
+							flag = 1;
+							self.location = {x: fuellist[i][0], y: fuellist[i][1]};
+							self.log("ULTIMA TEST karb to fuel: " + self.location.x + " " + self.location.y);
+						}
+					}
+			}
+			if (flag === 0){
+				self.typed = 1;
+			}
+			else {
+				self.typed = 0;
+			}
     }
 }
   //mine or depot
@@ -173,7 +244,7 @@ if (!self.location && !self.typed)
     dx = self.location.x - xcord;
     dy = self.location.y - ycord;
 		if (square_distance(self.me, self.location) > 4){
-			var adjacent = onestep(buildvision,fullmap,xcord,ycord,location,self.me);
+			var adjacent = onestep(buildvision,fullmap,xcord,ycord,self.location,self.me,edge);
 			dx = adjacent[0];
 			dy = adjacent[1];
 		}
@@ -183,7 +254,7 @@ if (!self.location && !self.typed)
     dx = self.location.x - xcord;
     dy = self.location.y - ycord;
 		if (square_distance(self.me, self.location) > 4){
-			var adjacent = onestep(buildvision,fullmap,xcord,ycord,location,self.me);
+			var adjacent = onestep(buildvision,fullmap,xcord,ycord,self.location,self.me,edge);
 			dx = adjacent[0];
 			dy = adjacent[1];
 		}
@@ -194,7 +265,7 @@ if (!self.location && !self.typed)
          if(visibleRobots[i].unit === 0){
 	   // dx = visibleRobots[i].x - xcord;
 	   // dy = visibleRobots[i].y - ycord;
-		 			var adjacent = onestep(buildvision,fullmap,xcord,ycord,visibleRobots[i],self.me);
+		 			var adjacent = onestep(buildvision,fullmap,xcord,ycord,visibleRobots[i],self.me,edge);
 					dx = adjacent[0];
 					dy = adjacent[1];
 					var outward = adjacent[2]
