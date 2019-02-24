@@ -23,6 +23,7 @@ castle.takeTurn = (self) => {
             self.pendingRecievedMessages[robot.id] = null;
         }
     }
+    //self.castleTalk(77);
 
     if (self.step % 100) {
         // self.log('KNOWN ENEMY CASTLES: ');
@@ -36,7 +37,7 @@ castle.takeTurn = (self) => {
         self.log('Building a pilgrim at ' + (self.me.x+1) + ',' + (self.me.y+1));
         self.pilgrimsBuilt++;
         return self.buildUnit(SPECS.PILGRIM, 1, 0);
-    } 
+    }
 
     if (self.karbonite > 200) {
         // const unitEnum = Math.floor(Math.random() * 3);

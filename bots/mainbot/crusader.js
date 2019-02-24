@@ -23,6 +23,7 @@ function is_horizontal(fullmap) {
 
 crusader.makemove = (self) => {
 				self.log("Crusader: " + self.id + " Beggining turn");
+        //self.castleTalk(99);
 				var rushbot = false;
 				var inPosition; // Set to true when prophet gets to desired location
 				if(inPosition == undefined) // Initialize the variable

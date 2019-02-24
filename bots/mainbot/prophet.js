@@ -72,6 +72,7 @@ prophet.makemove = (self) => {
   //   }
 	// }
 	self.log("Prophet: " + self.id + " Beggining turn");
+	//self.castleTalk(88);
 	var inPosition; // Set to true when prophet gets to desired location
 	if(inPosition == undefined) // Initialize the variable
 					inPosition = false;
