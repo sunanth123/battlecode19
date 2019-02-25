@@ -325,7 +325,7 @@ function buildOnEmptyOther(buildvision,fullmap,xcord,ycord)
 }
 
 //helper function to see if unit can be built in adjacent tile
-function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
+function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself,edge)
 {
      var returnedArray = [];
      var flag = 0;
@@ -336,7 +336,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      var x = myself.x - 1;
      var y = myself.y - 1;
 
-     if(buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dy = - 1;
        dx = - 1;
        inside += 1;
@@ -344,7 +344,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0;
        dy = - 1;
        inside += 1;
@@ -352,7 +352,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = - 1;
        inside += 1;
@@ -360,7 +360,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y;
-     if(buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 0;
        inside += 1;
@@ -368,7 +368,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y;
-     if(buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 0;
        inside += 1;
@@ -376,7 +376,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance({x,y}, resource) < resdist){
        dx = - 1;
        dy = 1;
        inside += 1;
@@ -384,7 +384,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance({x,y}, resource) < resdist){
        dx = 0;
        dy = 1;
        inside += 1;
@@ -392,7 +392,7 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
+     if(x < edge && x > 0 && y < edge && y > 0 && buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance({x,y}, resource) < resdist){
        dx = 1;
        dy = 1;
        inside += 1;
@@ -408,6 +408,24 @@ function buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,myself)
      return returnedArray;
 }
 
+
+function is_horizontal(fullmap) {
+    const length = fullmap.length;
+    var check = true;
+    for (let y = 0; check && length > y; y++) {
+        for (let x = 0; check && length > x; x++) {
+						if (fullmap[y][x] === fullmap[length - y -1][x]){
+							check = true;
+						}
+						else{
+							check = false;
+						}
+        }
+    }
+    return check
+}
+
+
 castle.makemove = (self) => {
   //add castle logic
   self.log("castle turn");
@@ -418,6 +436,85 @@ castle.makemove = (self) => {
   const visiblerobots = self.getVisibleRobots();
   const karboniteMap = self.getKarboniteMap();
   const fuelMap = self.getFuelMap();
+
+
+	const hor = is_horizontal(fullmap);
+	var enemy_x;
+	var enemy_y;
+	self.log(hor);
+	if (hor){
+		enemy_x = self.me.x;
+		enemy_y = fullmap.length - self.me.y - 1;
+	}
+	else{
+		enemy_x = fullmap.length - self.me.x - 1;
+		enemy_y = self.me.y;
+	}
+	self.log("enemy castle at: " + enemy_x + " " + enemy_y);
+
+
+//castle talk logic to store location of all friendly castles and their coordinants
+			//self.log("MESSAGESEND " + robot.id + " " + robot.castle_talk)
+			var flag = 0;
+			var count = 0;
+			if(!self.friendlycastle){
+				self.friendlycastle = [];
+				for (let i = 0; i < visiblerobots.length;i++){
+					count += 1;
+					if (visiblerobots[i].castle_talk !== 0){
+						flag = 1;
+					}
+				}
+				//self.log("COUNT IS :" + count);
+				if (count === 4){
+					flag = 0;
+				}
+				if (flag === 0){
+					for (let x = 0; x < visiblerobots.length;x++){
+						self.friendlycastle.push([visiblerobots[x].id,visiblerobots[x].castle_talk,0]);
+					}
+				}
+				else{
+					for (let z = 0; z < visiblerobots.length;z++){
+						if (visiblerobots[z].castle_talk !== 0){
+							self.friendlycastle.push([visiblerobots[z].id,visiblerobots[z].castle_talk,0]);
+						}
+					}
+					self.friendlycastle.push([self.me.id,0,0]);
+				}
+			}
+			else if (self.me.turn < 4){
+				for (let i = 0; i < self.friendlycastle.length; i++){
+					for (let x = 0; x < visiblerobots.length;x++){
+						if (visiblerobots[x].id === self.friendlycastle[i][0] && self.friendlycastle[i][1] === 0){
+							self.friendlycastle[i][1] = visiblerobots[x].castle_talk;
+						}
+						else if (visiblerobots[x].id === self.friendlycastle[i][0] && self.friendlycastle[i][2] === 0){
+							self.friendlycastle[i][2] = visiblerobots[x].castle_talk;
+						}
+					}
+				}
+			}
+
+	self.log("NUMBER OF CASTLES " + self.friendlycastle.length);
+	self.log(self.friendlycastle);
+	self.log("TURN COUNT IS: " + self.me.turn);
+
+	if (self.me.turn === 1){
+		self.castleTalk(self.me.x);
+	}
+	if (self.me.turn === 2){
+		self.castleTalk(self.me.y);
+	}
+	if (self.me.turn === 3 && self.friendlycastle.length > 3){
+		for (let i = 0; i < self.friendlycastle.length; i++){
+			if (self.friendlycastle[i][1] === 0 && self.friendlycastle[i][2] === 0){
+				self.friendlycastle.splice(i,1);
+			}
+		}
+	}
+
+
 
   //check if enemy unit is in attack range and attack if in range
   for (var i=0; i<visiblerobots.length; i++) {
@@ -434,13 +531,27 @@ castle.makemove = (self) => {
   if (self.me.turn === 1){
     var xcord = self.me.x;
     var ycord = self.me.y;
+		var edge = fullmap.length - 1;
     //const karboniteMap = self.getKarboniteMap();
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, karboniteMap);
     self.log(resource);
     self.log(resource.x);
 
-    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,self.me);
+		// if (xcord === edge || xcord === 0 || ycord === edge || ycord === 0)
+		// {
+		// 			self.log("FKASFLKJASFJLKASJFLKAJSKFJKASFJLKASJFLK");
+		// 			var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
+		// 	    if (adjacentInfo[2] === 1){
+		// 	      self.log("unable to build pilgrim");
+		// 	    }
+		// 	    else{
+		// 	      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+		// 	      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+		// 			}
+		// }
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource,self.me,edge);
     self.log(adjacentInfo[3]);
     if (adjacentInfo[2] === 1){
       self.log("unable to build pilgrim");
@@ -454,11 +565,12 @@ castle.makemove = (self) => {
   else if (self.me.turn === 2){
     var xcord = self.me.x;
     var ycord = self.me.y;
+		var edge = fullmap.length - 1;
     //const fuelMap = self.getFuelMap();
     self.log(xcord + " " + ycord);
     var resource = getClosestRes(self.me, fuelMap);
 
-    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me);
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
     if (adjacentInfo[2] === 1){
       self.log("unable to build pilgrim");
     }
@@ -469,18 +581,99 @@ castle.makemove = (self) => {
   }
 
 
+
+	if(visiblerobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length === 0){
+		var xcord = self.me.x;
+    var ycord = self.me.y;
+		var edge = fullmap.length - 1;
+    self.log(xcord + " " + ycord);
+    var resource = getClosestRes(self.me, karboniteMap);
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
+    if (adjacentInfo[2] === 1){
+      self.log("unable to build pilgrim");
+    }
+    else{
+      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+    }
+	}
+	else if(visiblerobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length === 1){
+		var xcord = self.me.x;
+    var ycord = self.me.y;
+		var edge = fullmap.length - 1;
+    self.log(xcord + " " + ycord);
+    var resource = getClosestRes(self.me, fuelMap);
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
+    if (adjacentInfo[2] === 1){
+      self.log("unable to build pilgrim");
+    }
+    else{
+      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+    }
+	}
+
+
+
+	if(!self.outwardlocal){
+		self.outwardlocal = 0;
+	}
+
+	const totalmove = //total possible moves
+					[[0,-1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [2, 0], [-2, 0], [0, 2], [0, -2], [3,0], [-3,0], [0,3], [0,-3], [2,2], [-2,-2], [-2,2], [2,-2], [2,1], [-2,1], [-2,-1], [2,-1], [1,2], [-1,2], [-1,-2], [1,-2]];
+
+
+	for (let i = 0; i < totalmove.length; i++){
+		if (fuelMap[self.me.y + totalmove[i][1]][self.me.x + totalmove[i][0]] === true)
+		{
+			self.outwardlocal += 1;
+		}
+		if (karboniteMap[self.me.y + totalmove[i][1]][self.me.x + totalmove[i][0]] === true)
+		{
+			self.outwardlocal += 1;
+		}
+	}
+	self.log("OUTWARD LOCAL: " + self.outwardlocal);
+	if (self.me.turn % 10 === 0 && visiblerobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length < self.outwardlocal){
+		var xcord = self.me.x;
+    var ycord = self.me.y;
+		var edge = fullmap.length - 1;
+    self.log(xcord + " " + ycord);
+    var resource = getClosestRes(self.me, fuelMap);
+
+    var adjacentInfo = buildOnEmpty(buildvision,fullmap,xcord,ycord,resource, self.me, edge);
+    if (adjacentInfo[2] === 1){
+      self.log("unable to build pilgrim");
+    }
+    else{
+      self.log("Building a pilgrim at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+      return self.buildUnit(SPECS.PILGRIM, adjacentInfo[0], adjacentInfo[1]);
+    }
+	}
+
+	self.outwardlocal = 0;
+
+
+
+
   //if karbonite is greater than or equal to 60 start making prophets
   if (self.karbonite >= 60){
     var xcord = self.me.x;
     var ycord = self.me.y;
     var adjacentInfo = buildOnEmptyOther(buildvision,fullmap,xcord,ycord);
     if (adjacentInfo[2] === 1){
-      self.log("unable to build prophet");
+      self.log("unable to build");
     }
-    else{
+    else if (self.me.turn < 500){
       self.log("Building a prophet at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
       return self.buildUnit(SPECS.PROPHET, adjacentInfo[0], adjacentInfo[1]);
     }
+		else{
+			self.log("Building a crusader at " + (xcord + adjacentInfo[0]) + ", " + (ycord + adjacentInfo[1]));
+      return self.buildUnit(SPECS.CRUSADER, adjacentInfo[0], adjacentInfo[1]);
+		}
   }
 
 
@@ -518,7 +711,22 @@ function getClosestRes$1(current_loc, resource_map)
 	}
 	return closest_location;
 }
-function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
+
+function getreslist(current_loc, resource_map){
+	const map_length = resource_map.length;
+	var closest_location = [];
+
+	for (let y = 0; y < map_length; y++){
+		for (let x = 0; x < map_length; x++){
+			if (resource_map[y][x] && square_distance$1({x,y}, current_loc) < 25){
+				closest_location.push([x,y]);
+			}
+		}
+	}
+	return closest_location;
+}
+
+function onestep(buildvision,fullmap,xcord,ycord,resource,myself,edge)
 {
      var returnedArray = [];
      var resdist = 1000;
@@ -528,7 +736,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      var x = myself.x - 1;
      var y = myself.y - 1;
 
-     if(buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord-1][xcord-1] === 0 && fullmap[ycord-1][xcord-1] === true && square_distance$1({x,y}, resource) < resdist){
        dy = - 1;
        dx = - 1;
        inside += 1;
@@ -536,7 +744,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord-1][xcord] === 0 && fullmap[ycord-1][xcord] === true && square_distance$1({x,y}, resource) < resdist){
        dx = 0;
        dy = - 1;
        inside += 1;
@@ -544,7 +752,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y - 1;
-     if(buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord-1][xcord+1] === 0 && fullmap[ycord-1][xcord+1] === true && square_distance$1({x,y}, resource) < resdist){
        dx = 1;
        dy = - 1;
        inside += 1;
@@ -552,7 +760,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y;
-     if(buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord][xcord-1] === 0 && fullmap[ycord][xcord-1] === true && square_distance$1({x,y}, resource) < resdist){
        dx = - 1;
        dy = 0;
        inside += 1;
@@ -560,7 +768,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y;
-     if(buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord][xcord+1] === 0 && fullmap[ycord][xcord+1] === true && square_distance$1({x,y}, resource) < resdist){
        dx = 1;
        dy = 0;
        inside += 1;
@@ -568,7 +776,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x - 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord+1][xcord-1] === 0 && fullmap[ycord+1][xcord-1] === true && square_distance$1({x,y}, resource) < resdist){
        dx = - 1;
        dy = 1;
        inside += 1;
@@ -576,7 +784,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord+1][xcord] === 0 && fullmap[ycord+1][xcord] === true && square_distance$1({x,y}, resource) < resdist){
        dx = 0;
        dy = 1;
        inside += 1;
@@ -584,7 +792,7 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
      }
      x = myself.x + 1;
      y = myself.y + 1;
-     if(buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance$1({x,y}, resource) < resdist){
+     if(x <= edge && x >= 0 && y <= edge && y >= 0 && buildvision[ycord+1][xcord+1] === 0 && fullmap[ycord+1][xcord+1] === true && square_distance$1({x,y}, resource) < resdist){
        dx = 1;
        dy = 1;
        inside += 1;
@@ -600,13 +808,14 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself)
 pilgrim.makemove = (self) => {
   //add pilgrim logic
   self.log("pilgrim turn");
+	//self.castleTalk(77);
 
   const karboniteMap = self.getKarboniteMap();
   const fuelMap = self.getFuelMap();
   const visibleRobots = self.getVisibleRobots();
 	const buildvision = self.getVisibleRobotMap();
   const fullmap = self.getPassableMap();
-
+	var edge = fullmap.length - 1;
 
   var xcord = self.me.x;
   var ycord = self.me.y;
@@ -615,20 +824,73 @@ pilgrim.makemove = (self) => {
   //var fuel_loc = self.me;
   //var karbonite_loc = self.me;
 
-
+	// var karblist = getreslist(self.me, karboniteMap)
+	// self.log("karblist " + karblist);
+	// self.log(karblist[0][1]);
 
   //check if there's another pilgrim nearby
 if (!self.location && !self.typed)
 {
-		if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2).length % 2 === 0){
+		var flag = 0;
+		if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance$1(self.me, robot) < 25).length % 2 === 0){
       self.log("fuel pilgrim");
       self.location = getClosestRes$1(self.me, fuelMap);
-      self.typed = 0;
+			if (square_distance$1(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+				var fuellist = getreslist(self.me, fuelMap);
+				self.log("fuellist " + fuellist);
+				for (let i = 0; i < fuellist.length;i++){
+					if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
+						self.location = {x: fuellist[i][0], y: fuellist[i][1]};
+						self.log("ULTIMA TEST fuel switch: " + self.location.x + " " + self.location.y);
+					}
+				}
+			}
+			if(square_distance$1(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+					var karblist = getreslist(self.me, karboniteMap);
+					for (let i = 0; i < karblist.length;i++){
+						if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
+							flag = 1;
+							self.location = {x: karblist[i][0], y: karblist[i][1]};
+							self.log("ULTIMA TEST fuel to karb: " + self.location.x + " " + self.location.y);
+						}
+					}
+			}
+			if (flag === 0){
+				self.typed = 0;
+			}
+			else {
+				self.typed = 1;
+			}
     }
     else{
       self.log("karb pilgrim");
       self.location  = getClosestRes$1(self.me, karboniteMap);
-      self.typed = 1;
+			if (square_distance$1(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+				var karblist = getreslist(self.me, karboniteMap);
+			//	self.log("karblist " + karblist);
+				for (let i = 0; i < karblist.length;i++){
+					if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
+						self.location = {x: karblist[i][0], y: karblist[i][1]};
+						self.log("ULTIMA TEST another karb: " + self.location.x + " " + self.location.y);
+					}
+				}
+			}
+			if(square_distance$1(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+					var fuellist = getreslist(self.me, fuelMap);
+					for (let i = 0; i < fuellist.length;i++){
+						if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
+							flag = 1;
+							self.location = {x: fuellist[i][0], y: fuellist[i][1]};
+							self.log("ULTIMA TEST karb to fuel: " + self.location.x + " " + self.location.y);
+						}
+					}
+			}
+			if (flag === 0){
+				self.typed = 1;
+			}
+			else {
+				self.typed = 0;
+			}
     }
 }
   //mine or depot
@@ -660,7 +922,7 @@ if (!self.location && !self.typed)
     dx = self.location.x - xcord;
     dy = self.location.y - ycord;
 		if (square_distance$1(self.me, self.location) > 4){
-			var adjacent = onestep(buildvision,fullmap,xcord,ycord,location,self.me);
+			var adjacent = onestep(buildvision,fullmap,xcord,ycord,self.location,self.me,edge);
 			dx = adjacent[0];
 			dy = adjacent[1];
 		}
@@ -670,7 +932,7 @@ if (!self.location && !self.typed)
     dx = self.location.x - xcord;
     dy = self.location.y - ycord;
 		if (square_distance$1(self.me, self.location) > 4){
-			var adjacent = onestep(buildvision,fullmap,xcord,ycord,location,self.me);
+			var adjacent = onestep(buildvision,fullmap,xcord,ycord,self.location,self.me,edge);
 			dx = adjacent[0];
 			dy = adjacent[1];
 		}
@@ -681,7 +943,7 @@ if (!self.location && !self.typed)
          if(visibleRobots[i].unit === 0){
 	   // dx = visibleRobots[i].x - xcord;
 	   // dy = visibleRobots[i].y - ycord;
-		 			var adjacent = onestep(buildvision,fullmap,xcord,ycord,visibleRobots[i],self.me);
+		 			var adjacent = onestep(buildvision,fullmap,xcord,ycord,visibleRobots[i],self.me,edge);
 					dx = adjacent[0];
 					dy = adjacent[1];
 					var outward = adjacent[2];
@@ -730,55 +992,184 @@ if (!self.location && !self.typed)
 
 };
 
+// -----------
+// | |x| |x| |
+// -----------
+// |x| |o| |x|
+// -----------
+// | |x| |x| |
+// -----------
+
 // Attack Range 16-64
 const prophet = {};
 
 prophet.makemove = (self) => {
-  self.log("Phrophet: " + self.id + " Beggining turn");
-  var visibleUnits = self.getVisibleRobots(); // Units that can be seen by the prophet
+	// self.log("Phrophet: " + self.id + " Beggining turn");
+	// var inPosition; // Set to true when prophet gets to desired location
+  // if(inPosition == undefined) // Initialize the variable
+	// 	inPosition = false;
+	// var desiredPosition;               // Tile prophet wants to get to.
+	// var visibleUnits = self.getVisibleRobots(); // Units that can be seen by the prophet
+  // var visibleTiles = self.getVisibleRobotMap();
+	// var focalPoint; // What will be used as a reference for areas to check
+	// const latticePoint = //Place where a robot can position itself in refrence to the focal point
+	// 	[[0,-2], [1, -1], [2, 0], [1, 1], [0, 2], [-1, 1], [-2, 0], [-1, -1]];
+	//
+	//
+	//
+	// //*** Check if enemies are within range
+	// var enemies = visibleUnits.filter((robot) => {
+	// 		if(robot.team !== self.me.team){
+	// 		return true;
+	// 		}
+	// 		});
+	// if(enemies.length > 0){ // Attacking
+	// 	self.log("Phrophet: " + self.id + "  Found an enemy");
+	// 	var enemyToAttack; // Will contain id of robot to attack
+	// 	var distance;      // Used to store how far away an enemy is.
+	// 	for(var i = 0; i < 10; i++){
+	// 		distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
+	// 		if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+	// 			if(enemyToAttack == undefined){
+	// 				self.log("Phrophet: " + self.id + "  Attacking");
+	// 				enemyToAttack = enemies[i];
+	// 				var dx = enemyToAttack.x - self.me.x;
+	// 				var dy = enemyToAttack.y - self.me.y;
+	// 				return self.attack(dx, dy);
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// else{ // Movement
+	// 	if(focalPoint == undefined){ // Set a new units focal point.
+	// 		var Castles = self.getVisibleRobots();
+	// 		Castles = Castles.filter((robot) => {
+	// 			if(robot.unit !== 0)
+	// 				return false;
+	// 		  else
+	// 				return true;
+	// 		});
+	// 		if(Castles.length > 0){ // Find the castle where you spawned from.
+	// 			focalPoint = [Castles[0].x, Castles[0].y]; // Castles Y position
+	// 		}
+	// 	}
+  //   for(var i = 0; i < latticePoint.length; i++){
+	// 		var scoutTile = visibleTiles[focalPoint[0]+latticePoint[i][0]][focalPoint[1]+latticePoint[i][1]];
+  //     if(scoutTile == 0){
+	// 		var dx = focalPoint[0]+latticePoint[i][0];
+  //     var dy = focalPoint[1]+latticePoint[i][1];
+  //       desiredPosition = [self.me.x-dx, self.me.y-dy];
+  //       self.log(desiredPosition);
+	// 			return self.move(desiredPosition[0],desiredPosition[1]);
+	// 		}
+  //   }
+	// }
+	self.log("Prophet: " + self.id + " Beggining turn");
+	//self.castleTalk(88);
+	var inPosition; // Set to true when prophet gets to desired location
+	if(inPosition == undefined) // Initialize the variable
+					inPosition = false;
+	var visibleUnits = self.getVisibleRobots(); // Units that can be seen by the prophet
+	var visibleTiles = self.getVisibleRobotMap();
+	var kmap = self.getKarboniteMap();
+	var fmap = self.getFuelMap();
+	const moves = //Place where a robot can position itself in refrence to the focal point
+					[[0,-1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [2, 0], [-2, 0], [0, 2], [0, -2]];
 
-  //*** Set Direction to move in.
-  const choices = [[0,-1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
-  var choice;
-  if(choice == undefined)
-    choice = choices[Math.floor(Math.random()*choices.length)];
 
-  //*** Check if enemies are within range
-  var enemies = visibleUnits.filter((robot) => {
-    if(robot.team !== self.me.team){
-      return true;
-    }
-  });
-  if(enemies.length > 0){
-    self.log("Phrophet: " + self.id + "  Found an enemy");
-    var enemyToAttack; // Will contain id of robot to attack
-    var distance;      // Used to store how far away an enemy is.
-    for(var i = 0; i < 10; i++){
-      distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
-      if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
-        if(enemyToAttack == undefined){
-          self.log("Phrophet: " + self.id + "  Attacking");
-          enemyToAttack = enemies[i];
-          var dx = enemyToAttack.x - self.me.x;
-          var dy = enemyToAttack.y - self.me.y;
-          return self.attack(dx, dy);
-        }
+
+
+	//*** Check if enemies are within range
+	// var enemies = visibleUnits.filter((robot) => {
+	// if(robot.team !== self.me.team){
+	// return true;
+	// }
+	// });
+	// if(enemies.length > 0){ // Attacking
+	// self.log("Crusader: " + self.id + "  Found an enemy");
+	// var enemyToAttack; // Will contain id of robot to attack
+	// var distance;      // Used to store how far away an enemy is.
+	// for(var i = 0; i < 10; i++){
+	// distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
+	// if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+	// if(enemyToAttack == undefined){
+	// 	self.log("Phrophet: " + self.id + "  Attacking");
+	// 	enemyToAttack = enemies[i];
+	// 	var dx = enemyToAttack.x - self.me.x;
+	// 	var dy = enemyToAttack.y - self.me.y;
+	// 	return self.attack(dx, dy);
+	// }
+	// }
+	// }
+	// }
+
+	for (var i=0; i<visibleUnits.length; i++) {
+    if (visibleUnits[i].team !== self.me.team){
+      const range = (visibleUnits[i].x-self.me.x)**2 + (visibleUnits[i].y-self.me.y)**2;
+      if (range >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && range <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+        self.log('Crusader attack ' + visibleUnits[i] + ' at ' + (visibleUnits[i].x - self.me.x, visibleUnits[i].y - self.me.y));
+        return self.attack(visibleUnits[i].x - self.me.x, visibleUnits[i].y - self.me.y);
       }
     }
   }
 
-  else{
-     self.log("Phrophet: " + self.id + " Moving");
-     return self.move(choice[0],choice[1]);
-     if(self.map[self.me.y+choice[1]][self.me.x+choice[0]] == true)
-     return self.move(choice[0],choice[1]);
-     else{
-       const choice = choices[Math.floor(Math.random()*choices.length)];
-       return self.move(choice[0],choice[1]);
-     }
-  }
 
 
+	if (!self.castle_loc){
+		for (var i=0; i<visibleUnits.length; i++) {
+			if (visibleUnits[i].team === self.me.team && visibleUnits[i].unit === 0){
+				self.castle_loc = visibleUnits[i];
+			}
+		}
+	}
+
+
+	if(inPosition == true) // Don't move if in position
+		return self.move(0, 0);
+
+	var latticeSum = (self.me.x+self.me.y);
+	latticeSum = latticeSum%2;
+	if( latticeSum == 0){ // if (x+y)mod2 = 0, unit is on a lattice point.
+		var goodLatticePoint = true;
+
+		if(kmap[self.me.y][self.me.x] == true) // Check to see if the unit is standing on karb
+			goodLatticePoint = false;
+
+		if(fmap[self.me.y][self.me.x] == true) // Check to see if the unit is standing on fuel
+			goodLatticePoint = false;
+
+		//check to see if unit is next to a castle
+		var sq_dis = Math.pow(self.me.x - self.castle_loc.x, 2) + Math.pow(self.me.y - self.castle_loc.y, 2);
+		if(sq_dis < 3)
+			goodLatticePoint = false;
+
+		if(goodLatticePoint == true){
+			inPosition = true;
+			//return self.move(0,0);
+		}
+
+	}
+
+	if(inPosition != true){
+
+	self.log("finding new position");
+		var move;
+		var validmove = false;
+		var newx;
+		var newy;
+		while(validmove == false){
+			move = moves[Math.floor(Math.random()*moves.length)];
+			newx = self.me.x + move[0];
+			newy = self.me.y + move[1];
+			validmove = true;
+			if(visibleTiles[newy][newx] != 0)
+				validmove = false;
+			if(self.map[newy][newx] != true)
+				validmove = false;
+		}
+		self.log("Moving to " + newx + " " + newy);
+		return self.move(move[0],move[1]);
+	}
 };
 
 const preacher = {};
@@ -790,12 +1181,174 @@ preacher.makemove = (self) => {
 
 const crusader = {};
 
+
+
+
 crusader.makemove = (self) => {
-  //add crusader logic
-  const choices = [[0,-1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
-  const choice = choices[Math.floor(Math.random()*choices.length)];
-  self.log("Crusader moving");
-  return self.move(...choice);
+				self.log("Crusader: " + self.id + " Beggining turn");
+				var inPosition; // Set to true when prophet gets to desired location
+				if(inPosition == undefined) // Initialize the variable
+								inPosition = false;
+				var visibleUnits = self.getVisibleRobots(); // Units that can be seen by the prophet
+				var visibleTiles = self.getVisibleRobotMap();
+        var kmap = self.getKarboniteMap();
+        var fmap = self.getFuelMap();
+				const moves = //Place where a robot can position itself in refrence to the focal point
+								[[0,-1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [2, 0], [-2, 0], [0, 2], [0, -2]];
+
+        const fullmap = self.getPassableMap();
+
+if (false){
+
+	//self.log(self.moves_made[0][0]);
+
+	{
+		for (var i; i<visibleUnits.length; i++) {
+	  }
+	}
+
+	// var enemies = visibleUnits.filter((robot) => {
+	// 		if(robot.team !== self.me.team){
+	// 		return true;
+	// 		}
+	// 		});
+	// if(enemies.length > 0){ // Attacking
+	// 	self.log("Crusader: " + self.id + "  Found an enemy");
+	// 	var enemyToAttack; // Will contain id of robot to attack
+	// 	var distance;      // Used to store how far away an enemy is.
+	// 	for(var i = 0; i < 10; i++){
+	// 		distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
+	// 		if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+	// 			if(enemyToAttack == undefined){
+	// 				self.log("Phrophet: " + self.id + "  Attacking");
+	// 				enemyToAttack = enemies[i];
+	// 				var dx = enemyToAttack.x - self.me.x;
+	// 				var dy = enemyToAttack.y - self.me.y;
+	// 				return self.attack(dx, dy);
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	for (var i; i<visibleUnits.length; i++) {
+  }
+
+
+
+	for (var i; i < totalmove.length; i++){
+		{
+			{
+				//self.log("inside moves made loop");
+				{
+					//self.log("inside map check");
+					var sq_dis;
+				}
+			}
+		}
+	}
+	//self.log("no PROBLEM IN LOOP");
+	//self.log(least);
+	{
+		for (var i; i < self.moves_made.length; i++){
+		}
+	}
+
+
+
+}
+else{
+//*** Check if enemies are within range
+	// var enemies = visibleUnits.filter((robot) => {
+	// 		if(robot.team !== self.me.team){
+	// 		return true;
+	// 		}
+	// 		});
+	// if(enemies.length > 0){ // Attacking
+	// 	self.log("Crusader: " + self.id + "  Found an enemy");
+	// 	var enemyToAttack; // Will contain id of robot to attack
+	// 	var distance;      // Used to store how far away an enemy is.
+	// 	for(var i = 0; i < 10; i++){
+	// 		distance = (enemies[i].x-self.me.x)**2 + (enemies[i].y-self.me.y)**2;
+	// 		if(distance >= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[0] && distance <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+	// 			if(enemyToAttack == undefined){
+	// 				self.log("Phrophet: " + self.id + "  Attacking");
+	// 				enemyToAttack = enemies[i];
+	// 				var dx = enemyToAttack.x - self.me.x;
+	// 				var dy = enemyToAttack.y - self.me.y;
+	// 				return self.attack(dx, dy);
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	for (var i=0; i<visibleUnits.length; i++) {
+    if (visibleUnits[i].team !== self.me.team){
+      const range = (visibleUnits[i].x-self.me.x)**2 + (visibleUnits[i].y-self.me.y)**2;
+      if (range <= SPECS.UNITS[self.me.unit].ATTACK_RADIUS[1]){
+        self.log('Crusader attack ' + visibleUnits[i] + ' at ' + (visibleUnits[i].x - self.me.x, visibleUnits[i].y - self.me.y));
+        return self.attack(visibleUnits[i].x - self.me.x, visibleUnits[i].y - self.me.y);
+      }
+    }
+  }
+
+	if (!self.castle_loc){
+		for (var i=0; i<visibleUnits.length; i++) {
+			if (visibleUnits[i].team === self.me.team && visibleUnits[i].unit === 0){
+				self.castle_loc = visibleUnits[i];
+			}
+		}
+	}
+
+
+
+        if(inPosition == true) // Don't move if in position
+					return self.move(0, 0);
+
+				var latticeSum = (self.me.x+self.me.y);
+        latticeSum = latticeSum%2;
+        if( latticeSum == 0){ // if (x+y)mod2 = 0, unit is on a lattice point.
+          var goodLatticePoint = true;
+
+          if(kmap[self.me.y][self.me.x] == true) // Check to see if the unit is standing on karb
+						goodLatticePoint = false;
+
+          if(fmap[self.me.y][self.me.x] == true) // Check to see if the unit is standing on fuel
+						goodLatticePoint = false;
+
+					//check to see if unit is next to a castle
+					var sq_dis = Math.pow(self.me.x - self.castle_loc.x, 2) + Math.pow(self.me.y - self.castle_loc.y, 2);
+					if(sq_dis < 3)
+						goodLatticePoint = false;
+
+					if(goodLatticePoint == true){
+						inPosition = true;
+						//return self.move(0,0);
+					}
+
+        }
+
+				if(inPosition != true){
+
+				self.log("finding new position");
+					var move;
+					var validmove = false;
+          var newx;
+					var newy;
+          while(validmove == false){
+						move = moves[Math.floor(Math.random()*moves.length)];
+						newx = self.me.x + move[0];
+						newy = self.me.y + move[1];
+						validmove = true;
+						if(visibleTiles[newy][newx] != 0)
+							validmove = false;
+						if(self.map[newy][newx] != true)
+              validmove = false;
+					}
+          self.log("Moving to " + newx + " " + newy);
+          return self.move(move[0],move[1]);
+				}
+
+  }
 };
 
 // eslint-disable-next-line no-unused-vars
