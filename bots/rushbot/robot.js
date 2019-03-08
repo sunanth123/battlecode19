@@ -6,16 +6,15 @@ import prophet from './prophet.js';
 import preacher from './preacher.js';
 import crusader from './crusader.js';
 
-
-// eslint-disable-next-line no-unused-vars
+//This is a general robot constructor that will intialize a new robot unit.
+//The actual logical implmentations for each robot can be reffered to at each
+//respective file for the unit.
 class MyRobot extends BCAbstractRobot {
     constructor() {
         super();
         this.unit_type = undefined;
-
         //can store other map information and message info as fields here
     }
-
     turn() {
         if (this.me.turn === 1) {
           //get some information on the first turn of unit.
