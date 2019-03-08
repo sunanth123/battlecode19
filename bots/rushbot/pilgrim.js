@@ -1,5 +1,6 @@
 import {BCAbstractRobot, SPECS} from 'battlecode';
 
+//code for pilgrim logic (i.e deciding what resource to mine)
 const pilgrim = {};
 
 //helper function to get the square distance from the current location to the destination
@@ -27,7 +28,7 @@ function getClosestRes(current_loc, resource_map)
 	return closest_location;
 };
 
-
+//function that gives a list of all the closest resources within 25 square distance.
 function getreslist(current_loc, resource_map){
 	const map_length = resource_map.length;
 	var closest_location = [];
@@ -43,7 +44,8 @@ function getreslist(current_loc, resource_map){
 	return closest_location;
 };
 
-
+//function that will check to see if movement of one adjacent square is valid
+//i.e not occupied or out of balance.
 function onestep(buildvision,fullmap,xcord,ycord,resource,myself,edge)
 {
      var returnedArray = [];
@@ -159,95 +161,101 @@ function onestep(buildvision,fullmap,xcord,ycord,resource,myself,edge)
      return returnedArray;
 }
 
+//below is logic for pilgrim turn.
 pilgrim.makemove = (self) => {
   //add pilgrim logic
   self.log("pilgrim turn");
-	//self.castleTalk(77);
 
+	//initialize the map information for the pilgrim to use.
   const karboniteMap = self.getKarboniteMap();
   const fuelMap = self.getFuelMap();
   const visibleRobots = self.getVisibleRobots();
 	const buildvision = self.getVisibleRobotMap();
   const fullmap = self.getPassableMap();
 	var edge = fullmap.length - 1;
-
   var xcord = self.me.x;
   var ycord = self.me.y;
   var dx = 0;
   var dy = 0;
-  //var fuel_loc = self.me;
-  //var karbonite_loc = self.me;
 
-	// var karblist = getreslist(self.me, karboniteMap)
-	// self.log("karblist " + karblist);
-	// self.log(karblist[0][1]);
-
-  //check if there's another pilgrim nearby
-if (!self.location && !self.typed)
-{
-		var flag = 0;
-		if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length % 2 === 0){
-      self.log("fuel pilgrim");
-      self.location = getClosestRes(self.me, fuelMap);
-			if (square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
-				var fuellist = getreslist(self.me, fuelMap)
-				self.log("fuellist " + fuellist);
-				for (let i = 0; i < fuellist.length;i++){
-					if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
-						self.location = {x: fuellist[i][0], y: fuellist[i][1]};
-						self.log("ULTIMA TEST fuel switch: " + self.location.x + " " + self.location.y);
-					}
-				}
-			}
-			if(square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
-					var karblist = getreslist(self.me, karboniteMap);
-					for (let i = 0; i < karblist.length;i++){
-						if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
-							flag = 1;
-							self.location = {x: karblist[i][0], y: karblist[i][1]};
-							self.log("ULTIMA TEST fuel to karb: " + self.location.x + " " + self.location.y);
-						}
-					}
-			}
-			if (flag === 0){
-				self.typed = 0;
-			}
-			else {
-				self.typed = 1;
-			}
-    }
-    else{
-      self.log("karb pilgrim");
-      self.location  = getClosestRes(self.me, karboniteMap);
-			if (square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
-				var karblist = getreslist(self.me, karboniteMap)
-			//	self.log("karblist " + karblist);
-				for (let i = 0; i < karblist.length;i++){
-					if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
-						self.location = {x: karblist[i][0], y: karblist[i][1]};
-						self.log("ULTIMA TEST another karb: " + self.location.x + " " + self.location.y);
-					}
-				}
-			}
-			if(square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
-					var fuellist = getreslist(self.me, fuelMap);
+	//---------------------------------------------------------------------------
+  //Set the ultimate location for where the pilgrim is destined to go. This means
+	//that the below logic will determine what type of resource the pilgrim will mine.
+	//When a pilgrim is first made it checks to see the number of nearby pilgrims, every
+	//even numbered pilgrim will mine fuel and every odd pilgrim will mine karbonite.
+	//However, if another pilgrim is already at closest resource then the next closest
+	//resource is mined instead.
+	if (!self.location && !self.typed)
+	{
+			var flag = 0;
+			if(visibleRobots.filter(robot => robot.team === self.me.team && robot.unit === 2 && square_distance(self.me, robot) < 25).length % 2 === 0){
+	      self.log("fuel pilgrim");
+	      self.location = getClosestRes(self.me, fuelMap);
+				if (square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+					var fuellist = getreslist(self.me, fuelMap)
+					self.log("fuellist " + fuellist);
 					for (let i = 0; i < fuellist.length;i++){
 						if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
-							flag = 1;
 							self.location = {x: fuellist[i][0], y: fuellist[i][1]};
-							self.log("ULTIMA TEST karb to fuel: " + self.location.x + " " + self.location.y);
+							self.log("ULTIMA TEST fuel switch: " + self.location.x + " " + self.location.y);
 						}
 					}
-			}
-			if (flag === 0){
-				self.typed = 1;
-			}
-			else {
-				self.typed = 0;
-			}
-    }
-}
-  //mine or depot
+				}
+				if(square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+						var karblist = getreslist(self.me, karboniteMap);
+						for (let i = 0; i < karblist.length;i++){
+							if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
+								flag = 1;
+								self.location = {x: karblist[i][0], y: karblist[i][1]};
+								self.log("ULTIMA TEST fuel to karb: " + self.location.x + " " + self.location.y);
+							}
+						}
+				}
+				if (flag === 0){
+					//type 0 is fuel pilgrim
+					self.typed = 0;
+				}
+				else {
+					//type 1 is karb pilgrim.
+					self.typed = 1;
+				}
+	    }
+	    else{
+	      self.log("karb pilgrim");
+	      self.location  = getClosestRes(self.me, karboniteMap);
+				if (square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+					var karblist = getreslist(self.me, karboniteMap)
+				//	self.log("karblist " + karblist);
+					for (let i = 0; i < karblist.length;i++){
+						if (buildvision[karblist[i][1]][karblist[i][0]] === 0){
+							self.location = {x: karblist[i][0], y: karblist[i][1]};
+							self.log("ULTIMA TEST another karb: " + self.location.x + " " + self.location.y);
+						}
+					}
+				}
+				if(square_distance(self.me, self.location) !== 0 && buildvision[self.location.y][self.location.x] !== 0){
+						var fuellist = getreslist(self.me, fuelMap);
+						for (let i = 0; i < fuellist.length;i++){
+							if (buildvision[fuellist[i][1]][fuellist[i][0]] === 0){
+								flag = 1;
+								self.location = {x: fuellist[i][0], y: fuellist[i][1]};
+								self.log("ULTIMA TEST karb to fuel: " + self.location.x + " " + self.location.y);
+							}
+						}
+				}
+				if (flag === 0){
+					self.typed = 1;
+				}
+				else {
+					self.typed = 0;
+				}
+	    }
+	}
+
+	//---------------------------------------------------------------------------
+  //check to see if pilgrim is at destination and if so mines the respective
+	//resource. Also checks to see if the pilgrim is directly adjacent a castle
+	//to deposit resources if full.
   if(self.me.karbonite <= 18 && self.typed === 1 && square_distance (self.me, self.location) === 0){
     self.log("mining karbonite");
     return self.mine();
@@ -256,6 +264,7 @@ if (!self.location && !self.typed)
     self.log("mining fuel");
     return self.mine();
   }
+	//depositing resources if full and adjacent to castle.
   else{
     if(self.me.karbonite === 20 || self.me.fuel === 100){
       self.log("resources full");
@@ -264,13 +273,17 @@ if (!self.location && !self.typed)
         if(square_distance(self.me, visibleRobots[i]) <= 2 && visibleRobots[i].team === self.me.team && visibleRobots[i].unit === 0){
           dx = visibleRobots[i].x - xcord;
           dy = visibleRobots[i].y - ycord;
-	  self.log("pilgrim depoting resource");
+	  			self.log("pilgrim depoting resource");
           return self.give(dx, dy, self.me.karbonite, self.me.fuel);
         }
       }
     }
   }
 
+	//---------------------------------------------------------------------------
+	//if not already at resource and dont have full resources then move towards
+	//mining destination. Otherwise if full with resources and not adjacent to
+	//castle then move towards the closest adjacent tile to castle.
   if(self.me.fuel <= 90 && self.typed === 0){
 		self.log("test: moving to fuel");
     dx = self.location.x - xcord;
@@ -291,12 +304,11 @@ if (!self.location && !self.typed)
 			dy = adjacent[1];
 		}
   }
+	//moving back to castle.
   else if (self.typed === 0 || self.typed ===1){
      for(var i=0; i<visibleRobots.length; i++){
        if(visibleRobots[i].team === self.me.team){
          if(visibleRobots[i].unit === 0){
-	   // dx = visibleRobots[i].x - xcord;
-	   // dy = visibleRobots[i].y - ycord;
 		 			var adjacent = onestep(buildvision,fullmap,xcord,ycord,visibleRobots[i],self.me,edge);
 					dx = adjacent[0];
 					dy = adjacent[1];
@@ -334,7 +346,6 @@ if (!self.location && !self.typed)
 							dy = adjacent[1];
 						}
 					}
-
 					self.log("test: moving back to castle");
          }
        }
@@ -342,8 +353,6 @@ if (!self.location && !self.typed)
   }
   self.log("pilgrim moving");
   return self.move(dx, dy);
-
-
 }
 
 export default pilgrim;
