@@ -1,10 +1,19 @@
 # Battlecode19
 
+primary bot used is bots/rushbot
 
-Preliminary test can be done via the following command:
+## Directions on how to run:
+1. install npm.
+2. use command: npm install -g bc19
+3. run code of bot using: bc19run -b bots/rushbot -r bots/example_js
 
-bc19run -b bots/mainbot -r bots/mainbot --chi 100
+## Directions on how to compile and upload:
+1. cd into bot folder
+2. use command: bc19compile -d
+3. upload bot on: https://bc-challenger.appspot.com/upload
 
-Once we have a final bot we should be able to beat the opponent example bot:
-
-bc19run -b bots/mainbot -r bots/example_js --chi 1000
+## To view replay of game:
+1. after using bc19run extract replay.bc19 file
+2. download Clairvoyance: https://github.com/hgarrereyn/Clairvoyance
+3. follow directions on above repo for setup
+3. use replay.bc19 on Clairvoyance server (firefox browser most stable).
