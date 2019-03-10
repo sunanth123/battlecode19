@@ -4,12 +4,13 @@
   "description": "unit tests",
   "main": "testMain.js",
   "scripts": {
-    "test": "mocha ||  true"
+    "test": "nyc mocha"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.0.2"
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0"
   }
 }
