@@ -17,3 +17,7 @@ primary bot used is bots/rushbot
 2. download Clairvoyance: https://github.com/hgarrereyn/Clairvoyance
 3. follow directions on above repo for setup
 3. use replay.bc19 on Clairvoyance server (firefox browser most stable).
+
+## To Run tests:
+1. go to mochatest directory
+2. use command: npm test
